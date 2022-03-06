@@ -383,7 +383,7 @@ li > a:only-child:after {
 /*--/banner --*/
 
 .main-banner {
-    background: url(../images/banner.jpg)no-repeat center;
+    background: url('../img/banner.jpg')no-repeat center;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -394,7 +394,7 @@ li > a:only-child:after {
 }
 
 .main-banner.inner {
-    background: url(../images/banner.jpg)no-repeat center;
+    background: url('../img/banner.jpg')no-repeat center;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -403,7 +403,11 @@ li > a:only-child:after {
     position: relative;
     min-height: 20em;
 }
-
+.bg1 {
+    background-color: rgba(0, 0, 0, 0);
+    margin-top: 0;
+    background-image: url('../single-post-pic.jpg')
+}
 /*-- place holder --*/
 
 .banner-form ::-webkit-input-placeholder {
@@ -816,6 +820,11 @@ li.breadcrumb-item a {
     padding: 0;
 }
 
+.img-movie-shots {
+    max-width: 250px;
+    height: auto;
+}
+
 .img-deal1 h3 {
     color: #495057;
     font-size: 13px;
@@ -843,7 +852,7 @@ ul.w3layouts-box-list li {
 }
 
 .grid-img-right {
-    background: url(../images/single.jpg)no-repeat center;
+    background: url('../single-post-pic2.jpg')no-repeat center;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;

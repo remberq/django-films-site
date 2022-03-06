@@ -65,7 +65,7 @@ class Films(models.Model):
     directors = models.ManyToManyField('Actor', verbose_name='режиссер', related_name='film_director')
     actors = models.ManyToManyField('Actor', verbose_name='актеры', related_name='film_actor')
     genres = models.ManyToManyField('Genre', verbose_name='жанры')
-    world_premiere = models.DateTimeField('Премьера в мире', auto_now=True)
+    world_premiere = models.DateTimeField('Премьера в мире')
     budget = models.PositiveIntegerField('Бюджет', default=0, help_text='сумма в долларах')
     fees_in_russia = models.PositiveIntegerField('Сборы в России', default=0, help_text='сумма в долларах')
     fees_in_world = models.PositiveIntegerField('Сборы в Мире', default=0, help_text='сумма в долларах')
@@ -78,6 +78,9 @@ class Films(models.Model):
         class_name = self.__class__.__name__.lower()
         instance_name = self.url
         return f'{class_name}/{instance_name}'
+
+    def get_review(self):
+        return self.reviews_set.filter(parent__isnull=True)
 
     def __str__(self):
         return self.title
