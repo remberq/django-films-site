@@ -24,13 +24,20 @@
                     </li>
                     <li style="list-style: none"><span><b>Слоган:</b> {{ films.tagline }}</span>
                     </li>
-                    {% for i in films.directors.all %}
+                    {% for dir in films.directors.all %}
                         <li style="list-style: none">
-                            <span><b>Режиссер:</b> {{ i.name }}</span></li>
+                            <span><b>Режиссер:</b> <a href="{{ dir.get_absolute_url }}">
+                                {{ dir.name }}
+                            </a></span></li>
                     {% endfor %}
-                    {% for i in films.actor.all %}
-                        <li style="list-style: none"><span><b>Актеры:</b> {{ i.name }}</span></li>
+
+                    <li style="list-style: none"><span><b>Актеры:</b>{% for actor in films.actors.all %}
+                        <a href="{{ actor.get_absolute_url }}">
+                            {{ actor.name }}
+                            </a>
                     {% endfor %}
+                            </span></li>
+
                     {% for g in films.genres.all %}
                         <li style="list-style: none"><span><b>Жанр:</b>{{ g.name }} </span>
                         </li>
@@ -44,20 +51,19 @@
                     <li style="list-style: none"><span><b>Сборы в мире:</b> ${{ films.fees_in_world }}</span>
                     </li>
                     <li style="list-style: none">
-                        <a href="#"><b>Рейтинг:</b>
-                            <span class="fa fa-star" aria-hidden="true"
-                                  style="outline: none; cursor: inherit;"></span>
-                            <span class="fa fa-star" aria-hidden="true"
-                                  style="outline: none; cursor: inherit;"></span>
-                            <span class="fa fa-star" aria-hidden="true"
-                                  style="outline: none; cursor: inherit;"></span>
-                            <span class="fa fa-star" aria-hidden="true"
-                                  style="outline: none; cursor: inherit;"></span>
-                            <span class="fa fa-star" aria-hidden="true"
-                                  style="outline: none; cursor: inherit;"></span>
-                            <span class="editContent"
-                                  style="outline: none; cursor: inherit;">5.0</span>
-                        </a>
+                       <form action="{% url 'add_rating' %}" method="post" name="rating">
+                            <b>Рейтинг:</b>
+                            {% csrf_token %}
+                            <input type="hidden" value="{{ films.id }}" name="movie">
+                            <span class="rating">
+                                {% for k, v in star_form.fields.star.choices %}
+                                    <input id="rating{{ v }}" type="radio" name="star"
+                                           value="{{ k }}">
+                                    <label for="rating{{ v }}">{{ k }}</label>
+                                {% endfor %}
+                            </span>
+                            <span class="editContent">4.0</span>
+                        </form>
                     </li>
                     <div class="share-desc">
                         <div class="share">
@@ -101,24 +107,22 @@
                     <img src="{{ img.image.url }}" class="img-movie-shots" alt="{{ img.image.description }}">
                 {% endfor %}
             </p>
-            <p class="editContent" style="outline: none; cursor: inherit;">{{ films.description }}</p>
-            <p class="mt-3 italic-blue editContent"
-               style="outline: none; cursor: inherit;">
-                <iframe width="560" height="315"
-                        src="https://www.youtube.com/embed/A36LahZNUiE?controls=0"
-                        frameborder="0" allow="accelerometer; autoplay;
-                                                                           encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-
-                </iframe>
-            </p>
+            <p class="editContent" style="outline: none; cursor: inherit;">{{ films.description|safe }}</p>
+            {#            <p class="mt-3 italic-blue editContent"#}
+            {#               style="outline: none; cursor: inherit;">#}
+            {#                <iframe width="560" height="315"#}
+            {#                        src="https://www.youtube.com/embed/A36LahZNUiE?controls=0"#}
+            {#                        frameborder="0" allow="accelerometer; autoplay;#}
+            {#                                                                           encrypted-media; gyroscope; picture-in-picture"#}
+            {#                        allowfullscreen>#}
+            {##}
+            {#                </iframe>#}
+            {#            </p>#}
             <p class="mt-3 editContent" style="outline: none; cursor: inherit;">
-                Человечество дорого заплатило за технический прогресс, поставив под
-                угрозу свое выживание.
-                Пришло время покончить с войной между машинами и людьми.
-                Научно-фантастический боевик,
-                заключительная часть трилогии, перезапускающей франшизу «Терминатора»
-                Джеймса Кэмерона.
+                Я знаю, вы меня слышите. Я чувствую вас. Я знаю, вы боитесь. Боитесь нас. Боитесь перемен.
+                Я не знаю будущего. Я не стану предсказывать, чем все кончится. Я скажу лишь, с чего начнётся.
+                Сейчас я повешу трубку и потом покажу людям то, что вы хотели скрыть. Я покажу им мир… без вас.
+                Мир без диктата и запретов, мир без границ. Мир… где возможно все. Что будет дальше — решать вам.
             </p>
         </div>
         <hr>
@@ -173,17 +177,17 @@
                         </p>
                         <a href="#formReview" onclick="addReview('{{ rev.name }}', '{{ rev.id }}')">Answer</a>
                         {% for ans in rev.reviews_set.all %}
-                        <div class="media mt-5 editContent">
-                            <a class="pr-3" href="#">
-                                <img src="{% static 'main/img/te1.jpg' %}" class="img-fluid "
-                                     alt="image" style="outline: none; cursor: inherit;">
-                            </a>
-                            <div class="media-body">
-                                <h5 class="mt-0 editContent">{{ ans.name }}</h5>
-                                <p class="mt-2 editContent"> {{ ans.text }}</p>
+                            <div class="media mt-5 editContent">
+                                <a class="pr-3" href="#">
+                                    <img src="{% static 'main/img/te1.jpg' %}" class="img-fluid "
+                                         alt="image" style="outline: none; cursor: inherit;">
+                                </a>
+                                <div class="media-body">
+                                    <h5 class="mt-0 editContent">{{ ans.name }}</h5>
+                                    <p class="mt-2 editContent"> {{ ans.text }}</p>
 
+                                </div>
                             </div>
-                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -191,10 +195,10 @@
         </div>
     </div>
     <script>
-    function addReview(name, id) {
-        document.getElementById('contactparent').value = id;
-        document.getElementById('contactcomment').innerText = `${name}, `
-    }
+        function addReview(name, id) {
+            document.getElementById('contactparent').value = id;
+            document.getElementById('contactcomment').innerText = `${name}, `
+        }
     </script>
 {% endblock movies %}
 </div>

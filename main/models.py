@@ -32,6 +32,9 @@ class Actor(models.Model):
         instance_name = self.slug
         return f'{class_name}/{instance_name}'
 
+    def get_absolute_url(self):
+        return reverse('actors_view', kwargs={'slug': self.slug})
+
     def __str__(self):
         return self.name
 
@@ -91,6 +94,7 @@ class Films(models.Model):
     class Meta:
         verbose_name_plural = 'Фильмы'
         verbose_name = 'Фильм'
+        ordering = ['year']
 
 
 class FimShots(models.Model):
@@ -125,6 +129,7 @@ class RatingStar(models.Model):
     class Meta:
         verbose_name = 'Звезда рейтинга'
         verbose_name_plural = 'Звезды рейтинга'
+        ordering = ['-value']
 
 
 class Ratio(models.Model):

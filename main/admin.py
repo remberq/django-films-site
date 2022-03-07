@@ -1,9 +1,17 @@
 from django.contrib import admin
-
-# Register your models here.
+from django import forms
 from django.utils.safestring import mark_safe
-
 from main.models import *
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+
+
+class FilmsAdminForm(forms.ModelForm):
+    """Add ckeditor form to film description field"""
+    description = forms.CharField(label='Описание', widget=CKEditorUploadingWidget())
+
+    class Meta:
+        model = Films
+        fields = '__all__'
 
 
 @admin.register(Category)
@@ -14,13 +22,14 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class ReviewInLine(admin.TabularInline):
-    """add all film reviews at admin panel"""
+    """add all film reviews to films panel"""
     model = Reviews
     extra = 1  # <-- add extra form to add new review
     readonly_fields = ('name', 'email')
 
 
 class FilmShotsInline(admin.TabularInline):
+    """add shots to film panel"""
     model = FimShots
     extra = 1
     readonly_fields = ('get_image',)  # <-- add image-preview to edit view
@@ -42,6 +51,8 @@ class FilmsAdmin(admin.ModelAdmin):
     prepopulated_fields = {'url': ('title',)}  # <-- auto complete url field by title
     inlines = [FilmShotsInline, ReviewInLine]
     save_as = True  # <-- save copy in database as new object
+    actions = ['published', 'unpublished']
+    form = FilmsAdminForm  # <-- add ckeditor
     list_editable = ('draft',)
     fieldsets = (  # <-- make some fields inline
         ('Option 1', {
@@ -71,6 +82,31 @@ class FilmsAdmin(admin.ModelAdmin):
         return mark_safe(f'<img src={obj.poster.url} width="60" height="80"')
 
     get_image.short_description = 'Постер'
+
+    """Action to admin panel"""
+
+    def unpublished(self, request, queryset):
+        """Unpublished film"""
+        row_update = queryset.update(draft=True)
+        if row_update == 1:
+            message_bit = '1 запись была обновлена'
+        else:
+            message_bit = f'{row_update} записей были обновлены'
+        self.message_user(request, f'{message_bit}')
+
+    def published(self, request, queryset):
+        """Publish film"""
+        row_update = queryset.update(draft=False)
+        if row_update == 1:
+            message_bit = '1 запись была обновлена'
+        else:
+            message_bit = f'{row_update} записей были обновлены'
+        self.message_user(request, f'{message_bit}')
+
+    published.short_description = 'Опубликовать'
+    published.allowed_permission = ('change',)
+    unpublished.short_description = 'Убрать с публикации'
+    unpublished.allowed_permission = ('change',)
 
 
 @admin.register(Reviews)
