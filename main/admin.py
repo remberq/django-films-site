@@ -7,7 +7,9 @@ from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 class FilmsAdminForm(forms.ModelForm):
     """Add ckeditor form to film description field"""
-    description = forms.CharField(label='Описание', widget=CKEditorUploadingWidget())
+    description = forms.CharField(
+        label='Описание', widget=CKEditorUploadingWidget()
+    )
 
     class Meta:
         model = Films
