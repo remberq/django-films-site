@@ -22,7 +22,7 @@ class MoviesView(GenreYear, ListView):
     model = Films
     queryset = Films.objects.filter(draft=False)
     context_object_name = 'films'
-
+    paginate_by = 3
     # def get_context_data(self, *args, **kwargs):
     #     context = super().get_context_data(*args, **kwargs)
     #     context['categories'] = Category.objects.all()
@@ -38,6 +38,7 @@ class MovieDetailView(GenreYear, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['star_form'] = RatingForm()
+        context['form'] = ReviewForm()
         return context
 
 
@@ -66,6 +67,7 @@ class ActorDetailView(GenreYear, DetailView):
 class FilterFilmsView(GenreYear, ListView):
     """Films filter"""
     context_object_name = 'films'  # <-- context_obj_name should be the same with MovieView context_obj_name
+    paginate_by = 3
 
     def get_queryset(self):
         queryset = Films.objects.filter(
@@ -73,6 +75,12 @@ class FilterFilmsView(GenreYear, ListView):
             Q(genres__in=self.request.GET.getlist('genres'))
         ).distinct()  # <-- need to use distinct, or i don't know why queryset has 3 time take the same object
         return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['year'] = ''.join([f'year={x}&' for x in self.request.GET.getlist('year')])
+        context['genres'] = ''.join([f'genres={x}&' for x in self.request.GET.getlist('genres')])
+        return context
 
 
 class AddStarRating(View):
@@ -97,3 +105,16 @@ class AddStarRating(View):
             return HttpResponse(status=201)
         else:
             return HttpResponse(status=400)
+
+
+class SearchFilm(ListView):
+    """Search films"""
+    paginate_by = 3
+
+    def get_queryset(self):
+        return Films.objects.filter(title__icontains=self.request.GET.get('q'))
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['q'] = f'q={self.request.GET.get("q")}&'
+        return context
